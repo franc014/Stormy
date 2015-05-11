@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="base_url">https://api.forecast.io/forecast/</string>
+    <string name="api_key">9a1adaaaebe9314e8d58a9ecf46b9273</string>
+    <string name="latitude">37.8267</string>
+    <string name="longitude">-122.423</string>
+</resources>
