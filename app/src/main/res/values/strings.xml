@@ -3,7 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="weather_api_error_title">Oops, sorry!</string>
+    <string name="weather_api_error_title">Oops, sorry!!</string>
     <string name="weather_api_error_message">There was an error, please try again</string>
     <string name="weather_api_error_positive_button">Ok</string>
 </resources>
