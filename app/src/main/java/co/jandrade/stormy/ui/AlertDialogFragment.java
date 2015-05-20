@@ -1,10 +1,12 @@
-package co.jandrade.stormy;
+package co.jandrade.stormy.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+
+import co.jandrade.stormy.R;
 
 /**
  * Created by Juan Francisco Andrade on 4/22/15.

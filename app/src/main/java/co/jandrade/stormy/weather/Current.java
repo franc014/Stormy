@@ -1,4 +1,4 @@
-package co.jandrade.stormy;
+package co.jandrade.stormy.weather;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,7 +7,7 @@ import java.util.TimeZone;
 /**
  * Created by Juan Francisco Andarde on 4/27/15.
  */
-public class CurrentWeather {
+public class Current {
     private String mIcon;
     private long mTime;
     private double mTemperature;
@@ -24,44 +24,13 @@ public class CurrentWeather {
         mIcon = icon;
     }
     public int getIconId(){
-        int iconId = R.mipmap.clear_day;
-
-        if (mIcon.equals("clear-day")) {
-            iconId = R.mipmap.clear_day;
-        }
-        else if (mIcon.equals("clear-night")) {
-            iconId = R.mipmap.clear_night;
-        }
-        else if (mIcon.equals("rain")) {
-            iconId = R.mipmap.rain;
-        }
-        else if (mIcon.equals("snow")) {
-            iconId = R.mipmap.snow;
-        }
-        else if (mIcon.equals("sleet")) {
-            iconId = R.mipmap.sleet;
-        }
-        else if (mIcon.equals("wind")) {
-            iconId = R.mipmap.wind;
-        }
-        else if (mIcon.equals("fog")) {
-            iconId = R.mipmap.fog;
-        }
-        else if (mIcon.equals("cloudy")) {
-            iconId = R.mipmap.cloudy;
-        }
-        else if (mIcon.equals("partly-cloudy-day")) {
-            iconId = R.mipmap.partly_cloudy;
-        }
-        else if (mIcon.equals("partly-cloudy-night")) {
-            iconId = R.mipmap.cloudy_night;
-        }
-        return iconId;
+        return Forecast.getIconId(mIcon);
     }
 
     public Long getTime() {
         return mTime;
     }
+
     public String getFormattedTime(){
         SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
         formatter.setTimeZone(TimeZone.getTimeZone(mtimeZone));

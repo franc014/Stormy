@@ -1,11 +1,13 @@
-package co.jandrade.stormy;
+package co.jandrade.stormy.ui;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,18 +25,31 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
+import co.jandrade.stormy.LocationProvider;
+import co.jandrade.stormy.R;
+import co.jandrade.stormy.weather.Current;
+import co.jandrade.stormy.weather.Day;
+import co.jandrade.stormy.weather.Forecast;
+import co.jandrade.stormy.weather.Hour;
 
 
-public class MainActivity extends ActionBarActivity implements LocationProvider.LocationCallback{
+public class MainActivity extends ActionBarActivity implements LocationProvider.LocationCallback {
+    public static final String HOURLY_FORECAST = "HORLY_FORECAST";;
     public static String TAG = MainActivity.class.getSimpleName();
-    private CurrentWeather mCurrentWeather;
+    public static final String DAILY_FORECAST = "DAILY_FORECAST";
+    private Forecast mForecast;
     private LocationProvider mLocationProvider;
     private double mCurrentLatitude;
     private double mCurrentLongitude;
@@ -62,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements LocationProvider.
         });
         mLocationProvider = new LocationProvider(this,this);
         mLocationProvider.connect();
-        Log.d(TAG,"lati"+mCurrentLatitude);
+        Log.d(TAG, "lati" + mCurrentLatitude);
         getForecast();
 
 
@@ -88,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements LocationProvider.
         String longitude = String.valueOf(mCurrentLongitude);
 
         String url = baseUrl+apiKey+"/"+latitude+","+longitude;
-        Log.d(TAG,"forcast call..."+url);
+        Log.d(TAG, "forcast call..." + url);
 
         if(isNetworkAvailable()) {
             toggleRefresh();
@@ -123,7 +138,7 @@ public class MainActivity extends ActionBarActivity implements LocationProvider.
                         String jsonData = response.body().string();
 
                         if (response.isSuccessful()) {
-                            mCurrentWeather = getCurrentDetails(jsonData);
+                            mForecast = parseForecastDetails(jsonData);
                             //send message to main thread
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -162,16 +177,68 @@ public class MainActivity extends ActionBarActivity implements LocationProvider.
     }
 
     private void updateDisplay() {
-        mTemperatureLabel.setText(mCurrentWeather.getTemperature()+"");
-        mTimeLabel.setText("At "+mCurrentWeather.getFormattedTime()+" it will be:");
-        mHumidityValue.setText(mCurrentWeather.getHuminity()+"");
-        mPrecipValue.setText(mCurrentWeather.getPrecipChance() + " %");
-        mSummaryLabel.setText(mCurrentWeather.getSummary());
-        Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
+        mTemperatureLabel.setText(mForecast.getCurrent().getTemperature()+"");
+        mTimeLabel.setText("At "+ mForecast.getCurrent().getFormattedTime()+" it will be:");
+        mHumidityValue.setText(mForecast.getCurrent().getHuminity()+"");
+        mPrecipValue.setText(mForecast.getCurrent().getPrecipChance() + " %");
+        mSummaryLabel.setText(mForecast.getCurrent().getSummary());
+        Drawable drawable = getResources().getDrawable(mForecast.getCurrent().getIconId());
         mIconImageView.setImageDrawable(drawable);
     }
 
-    private CurrentWeather getCurrentDetails(String jsonData) throws JSONException{
+    private Forecast parseForecastDetails(String jsonData) throws JSONException{
+        Forecast forecast = new Forecast();
+        forecast.setCurrent(getCurrentDetails(jsonData));
+        forecast.setHours(getHourlyDetails(jsonData));
+        forecast.setDays(getDailyDetails(jsonData));
+        return forecast;
+    }
+
+    private List<Day> getDailyDetails(String jsonData) throws JSONException{
+
+        JSONObject forecast = new JSONObject(jsonData);
+        String timeZone = forecast.getString("timezone");
+        JSONObject daily = forecast.getJSONObject("daily");
+        JSONArray data = daily.getJSONArray("data");
+        Log.d(TAG, data.toString());
+        List<Day> days = new ArrayList<>();
+        for(int i=0;i< data.length();i++){
+            Day day = new Day();
+            JSONObject jsonDay = data.getJSONObject(i);
+            day.setTime(jsonDay.getLong("time"));
+            day.setSummary(jsonDay.getString("summary"));
+            day.setIcon(jsonDay.getString("icon"));
+            day.setTemperatureMax(jsonDay.getDouble("temperatureMax"));
+            day.setTimeZone(timeZone);
+            days.add(day);
+        }
+        return days;
+    }
+
+    private List<Hour> getHourlyDetails(String jsonData) throws JSONException{
+        JSONObject forecast = new JSONObject(jsonData);
+        String timeZone = forecast.getString("timezone");
+        JSONObject hourly = forecast.getJSONObject("hourly");
+        JSONArray data = hourly.getJSONArray("data");
+
+        List<Hour> hours = new ArrayList<>();
+
+        for(int i=0;i<data.length();i++){
+            Hour hour = new Hour();
+            JSONObject jsonHour = data.getJSONObject(i);
+            hour.setIcon(jsonHour.getString("icon"));
+            hour.setSummary(jsonHour.getString("summary"));
+            hour.setTime(jsonHour.getLong("time"));
+            hour.setTimeZone(timeZone);
+            hour.setTemperature(jsonHour.getDouble("temperature"));
+            hours.add(hour);
+        }
+
+        return hours;
+    }
+
+
+    private Current getCurrentDetails(String jsonData) throws JSONException{
         JSONObject forecast = new JSONObject(jsonData);
         String timezone = forecast.getString("timezone");
         JSONObject currently = forecast.getJSONObject("currently");
@@ -183,18 +250,18 @@ public class MainActivity extends ActionBarActivity implements LocationProvider.
         double temperature = currently.getDouble("temperature");
         String summary = currently.getString("summary");
 
-        CurrentWeather currentWeather = new CurrentWeather();
+        Current current = new Current();
 
-        currentWeather.setHuminity(humidity);
-        currentWeather.setIcon(icon);
-        currentWeather.setPrecipChance(precipChance);
-        currentWeather.setTemperature(temperature);
-        currentWeather.setSummary(summary);
-        currentWeather.setTime(time);
-        currentWeather.setTimeZone(timezone);
+        current.setHuminity(humidity);
+        current.setIcon(icon);
+        current.setPrecipChance(precipChance);
+        current.setTemperature(temperature);
+        current.setSummary(summary);
+        current.setTime(time);
+        current.setTimeZone(timezone);
 
-        Log.d(TAG,currentWeather.getFormattedTime());
-        return currentWeather;
+        Log.d(TAG, current.getFormattedTime());
+        return current;
     }
 
     private boolean isNetworkAvailable() {
@@ -227,5 +294,19 @@ public class MainActivity extends ActionBarActivity implements LocationProvider.
         mCurrentLatitude = location.getLatitude();
         mCurrentLongitude = location.getLongitude();
         getForecast();
+    }
+    @OnClick (R.id.dailyButton)
+    public void startDailyActivity(View view){
+        Intent intent = new Intent(this, DailyForecastActivity.class);
+        //putting Array List of Parcelable data
+        intent.putParcelableArrayListExtra(DAILY_FORECAST, (ArrayList<? extends Parcelable>) mForecast.getDays());
+        //intent.putExtra(DAILY_FORECAST, (Parcelable) mForecast.getDays());
+        startActivity(intent);
+    }
+    @OnClick (R.id.horlyButton)
+    public void startHourlyActivity(View view){
+        Intent intent = new Intent(this, HourlyForecastActivity.class);
+        intent.putParcelableArrayListExtra(HOURLY_FORECAST, (ArrayList<? extends Parcelable>) mForecast.getHours());
+        startActivity(intent);
     }
 }

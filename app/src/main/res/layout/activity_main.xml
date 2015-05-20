@@ -5,9 +5,8 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 tools:context=".MainActivity"
-                android:background="#ff33c6fd">
+                android:background="@drawable/bg_gradient">
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,6 +36,7 @@
         android:layout_above="@+id/degreeImageView"
         android:layout_centerHorizontal="true"
         android:textColor="#80ffffff"
+        android:paddingBottom="2px"
         android:textSize="18sp"/>
 
     <TextView
@@ -46,8 +46,8 @@
         android:id="@+id/locationLabel"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/timeLabel"
-        android:layout_marginBottom="60dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="40dp"
         android:textSize="22sp"
         android:textColor="@android:color/white"/>
 
@@ -55,12 +55,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/iconImageView"
-        android:layout_alignBottom="@+id/locationLabel"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:src="@mipmap/cloudy_night"
 
-        />
+        android:layout_above="@+id/timeLabel"
+        android:layout_centerHorizontal="true"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -133,7 +131,7 @@
         android:gravity="center_horizontal"
         android:layout_below="@+id/linearLayout"
 
-        android:layout_marginTop="40dp"/>
+        android:layout_marginBottom="20dp"/>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -150,6 +148,34 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_alignBottom="@+id/refreshImageView"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HOURLY"
+            android:id="@+id/horlyButton"
+            android:layout_weight="1"
+            android:background="#40ffffff"
+            android:textColor="#FFFFFFFF"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="7 DAY"
+            android:id="@+id/dailyButton"
+            android:layout_weight="1"
+            android:background="#40FFFFFF"
+            android:textColor="#FFFFFFFF"
+            android:layout_marginLeft="2dp"/>
+    </LinearLayout>
 
 
 </RelativeLayout>

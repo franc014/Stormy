@@ -6,4 +6,9 @@
     <string name="weather_api_error_title">Oops, sorry!!</string>
     <string name="weather_api_error_message">There was an error, please try again</string>
     <string name="weather_api_error_positive_button">Ok</string>
+    <string name="title_activity_daily_forecast">DailyForecastActivity</string>
+    <string name="no_daily_forecast_data">There is no data to display</string>
+    <string name="title_activity_test_list">testListA</string>
+    <string name="title_activity_ejemplo_list">EjemploListActivity</string>
+    <string name="title_activity_hourly_forecast">HourlyForecastActivity</string>
 </resources>
